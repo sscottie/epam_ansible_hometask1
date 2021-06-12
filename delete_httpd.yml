@@ -1,0 +1,16 @@
+---
+- name: delete httpd
+  hosts: all
+  tasks:
+    - name: delete httpd
+      yum: name=httpd state=absent
+    - name: delete file
+      file:
+        path: "/var/www/html/index.html"
+        state: absent
+    - name: close apache port
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: disabled
+...

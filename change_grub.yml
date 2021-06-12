@@ -1,0 +1,65 @@
+---
+- name: change grub
+  hosts: all
+  tasks:
+    - name: check ifnames exists
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX=".*ifnames='
+        state: absent
+      check_mode: yes
+      changed_when: false
+      register: out
+
+    - name: add ifnames found
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '(^GRUB_CMDLINE_LINUX=".*)(ifnames=[0-1])(.*)$'
+        line: '\1ifnames=0\3'
+        backrefs: yes
+      when: out.found
+      notify:
+        - run grub2
+
+    - name: add ifnames not found
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '(^GRUB_CMDLINE_LINUX=".*)"$'
+        line: '\1 ifnames=0"'
+        backrefs: yes
+      when: not out.found
+      notify:
+        - run grub2
+
+    - name: check biosdevname exists
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX=".*biosdevname='
+        state: absent
+      check_mode: yes
+      changed_when: false
+      register: out
+
+    - name: add biosdevname found
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '(^GRUB_CMDLINE_LINUX=".*)(biosdevname=[0-1])(.*)$'
+        line: '\1biosdevname=0\3'
+        backrefs: yes
+      when: out.found
+      notify:
+        - run grub2
+
+    - name: add biosdevname not found
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '(^GRUB_CMDLINE_LINUX=".*)"$'
+        line: '\1 biosdevname=0"'
+        backrefs: yes
+      when: not out.found
+      notify:
+        - run grub2
+  handlers:
+    - name: run grub2
+      shell: grub2-mkconfig -o /boot/grub2/grub.cfg 
+...
