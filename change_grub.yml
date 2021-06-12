@@ -14,8 +14,8 @@
     - name: add ifnames found
       lineinfile:
         path: /etc/default/grub
-        regexp: '(^GRUB_CMDLINE_LINUX=".*)(ifnames=[0-1])(.*)$'
-        line: '\1ifnames=0\3'
+        regexp: '(^GRUB_CMDLINE_LINUX=".*)(net\.ifnames=[0-1])(.*)$'
+        line: '\1net.ifnames=0\3'
         backrefs: yes
       when: out.found
       notify:
@@ -25,7 +25,7 @@
       lineinfile:
         path: /etc/default/grub
         regexp: '(^GRUB_CMDLINE_LINUX=".*)"$'
-        line: '\1 ifnames=0"'
+        line: '\1 net.ifnames=0"'
         backrefs: yes
       when: not out.found
       notify:
